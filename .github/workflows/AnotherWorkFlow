@@ -1,0 +1,37 @@
+name: POE
+'on':
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: null
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: List contents
+        run: ls
+      - name: compile classes
+        working-directory: ./src
+        run: >-
+          javac -cp
+          "../testresources/junit-platform-console-standalone-1.6.0.jar"
+          "./bookapp_yml/Book.java" "./bookapp_yml/BookApp_Yml.java"
+          "../test/bookapp_yml/BookTest.java"
+      - name: List contents of src directory after compile
+        working-directory: ./src/bookapp_yml
+        run: ls
+      - name: create testresources/bookapp_yml directory
+        run: mkdir -p ./testresources/bookapp_yml
+      - name: copy compiled classes to testresources directory
+        working-directory: ./src/bookapp_yml
+        run: cp -t  "../../test/bookapp_yml" Book.class BookApp_Yml.class
+      - name: copy compiled Test classes to testresources directory
+        working-directory: ./test/bookapp_yml
+        run: cp -t  "../../testresources/bookapp_yml" BookTest.class
+      - name: List contents test package
+        working-directory: ./test/bookapp_yml
+        run: ls
